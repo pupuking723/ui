@@ -236,6 +236,8 @@ export default defineNuxtModule<ModuleOptions>({
       nuxt.options.postcss.plugins['@tailwindcss/postcss'] = {}
     }
 
+    nuxt.options.css.unshift(resolve('./runtime/sources.css'))
+
     addPlugin({ src: resolve('./runtime/plugins/colors') })
 
     if (options.prose || options.mdc || options.content || hasNuxtModule('@nuxtjs/mdc') || hasNuxtModule('@nuxt/content')) {

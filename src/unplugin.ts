@@ -90,6 +90,24 @@ export interface NuxtUIOptions extends Omit<ModuleOptions, 'fonts' | 'colorMode'
 
 export const runtimeDir = normalize(fileURLToPath(new URL('./runtime', import.meta.url)))
 
+const uiImportRe = /@import\s+(?:url\()?["']@nuxt\/ui["']\)?(?:\s[^;]*)?;/
+const uiSourcesImportRe = /@import\s+(?:url\()?["']@nuxt\/ui\/sources["']\)?(?:\s[^;]*)?;/
+
+function CSSSourcesPlugin() {
+  return <UnpluginOptions>{
+    name: 'nuxt:ui:css-sources',
+    enforce: 'pre',
+    transformInclude: id => id.endsWith('.css'),
+    transform(code) {
+      if (!uiImportRe.test(code) || uiSourcesImportRe.test(code)) {
+        return
+      }
+
+      return `@import "@nuxt/ui/sources";\n${code}`
+    }
+  }
+}
+
 export const NuxtUIPlugin = createUnplugin<NuxtUIOptions | undefined>((_options = {}, meta) => {
   const options = defu(_options, { fonts: false }, defaultOptions)
 
@@ -102,6 +120,7 @@ export const NuxtUIPlugin = createUnplugin<NuxtUIOptions | undefined>((_options 
     NuxtEnvironmentPlugin(options),
     ComponentImportPlugin(options, meta),
     AutoImportPlugin(options, meta),
+    CSSSourcesPlugin(),
     tailwind(),
     PluginsPlugin(options),
     TemplatePlugin(options, appConfig),

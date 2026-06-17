@@ -261,15 +261,18 @@ export function getTemplates(options: ModuleOptions, uiConfig: Record<string, an
 `
 
   templates.push({
+    filename: 'ui.sources.css',
+    write: true,
+    getContents: () => generateSources()
+  })
+
+  templates.push({
     filename: 'ui.css',
     write: true,
     getContents: async () => {
-      const sources = await generateSources()
       const prefix = options.theme?.prefix ? `${options.theme.prefix}:` : ''
 
-      return `${sources}
-
-@layer base {
+      return `@layer base {
   body {
     @apply ${prefix}antialiased ${prefix}text-default ${prefix}bg-default ${prefix}scheme-light ${prefix}dark:scheme-dark;
   }
@@ -288,6 +291,12 @@ ${themeBlocks}`
     filename: 'ui.static.css',
     write: true,
     getContents: () => themeBlocks
+  })
+
+  templates.push({
+    filename: 'ui.sources.static.css',
+    write: true,
+    getContents: () => ''
   })
 
   templates.push({
